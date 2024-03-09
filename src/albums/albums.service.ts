@@ -1,26 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
+import { DbService } from 'src/db/db.service';
 
 @Injectable()
 export class AlbumsService {
+  constructor(private readonly dbService: DbService) {}
   create(createAlbumDto: CreateAlbumDto) {
-    return 'This action adds a new album';
+    const id = this.dbService.generateID();
+    const album = { ...createAlbumDto, id };
+    this.dbService.albums.push(album);
+    return album;
   }
 
   findAll() {
-    return `This action returns all albums`;
+    const albums = this.dbService.albums;
+    return albums;
   }
 
   findOne(id: string) {
-    return `This action returns a #${id} album`;
+    const album = this.dbService.albums.find((album) => album.id === id);
+    return album;
   }
 
   update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    return `This action updates a #${id} album`;
+    const index = this.dbService.albums.findIndex((album) => album.id === id);
+    const [album] = this.dbService.albums.splice(index, 1);
+    const updatedAlbum = { ...album, ...updateAlbumDto };
+    this.dbService.albums.push(updatedAlbum);
+    return updatedAlbum;
   }
 
   remove(id: string) {
-    return `This action removes a #${id} album`;
+    const index = this.dbService.albums.findIndex((album) => album.id === id);
+    const [album] = this.dbService.albums.splice(index, 1);
+    return album;
   }
 }

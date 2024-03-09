@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { DbService } from 'src/db/db.service';
 
 @Injectable()
 export class FavoritesService {
+  constructor(private readonly dbService: DbService) {}
   findAll() {
     return `This action returns all favorites`;
   }

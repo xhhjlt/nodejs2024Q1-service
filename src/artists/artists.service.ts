@@ -1,26 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
+import { DbService } from 'src/db/db.service';
 
 @Injectable()
 export class ArtistsService {
+  constructor(private readonly dbService: DbService) {}
+
   create(createArtistDto: CreateArtistDto) {
-    return 'This action adds a new artist';
+    const id = this.dbService.generateID();
+    const artist = { ...createArtistDto, id };
+    this.dbService.artists.push(artist);
+    return artist;
   }
 
   findAll() {
-    return `This action returns all artists`;
+    const artists = this.dbService.artists;
+    return artists;
   }
 
   findOne(id: string) {
-    return `This action returns a #${id} artist`;
+    const artist = this.dbService.artists.find((artist) => artist.id === id);
+    return artist;
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
-    return `This action updates a #${id} artist`;
+    const index = this.dbService.artists.findIndex(
+      (artist) => artist.id === id,
+    );
+    const [artist] = this.dbService.artists.splice(index, 1);
+    const updatedArtist = { ...artist, ...updateArtistDto };
+    this.dbService.artists.push(updatedArtist);
+    return updatedArtist;
   }
 
   remove(id: string) {
-    return `This action removes a #${id} artist`;
+    const index = this.dbService.artists.findIndex(
+      (artist) => artist.id === id,
+    );
+    const [artist] = this.dbService.artists.splice(index, 1);
+    return artist;
   }
 }
