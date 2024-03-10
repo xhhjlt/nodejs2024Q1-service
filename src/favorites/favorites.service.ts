@@ -25,7 +25,10 @@ export class FavoritesService {
   addTrack(id: string) {
     const track = this.dbService.tracks.find((track) => track.id === id);
     if (!track) {
-      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'Track not found',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     }
     this.dbService.favorites.tracks.push(id);
     return track;
@@ -45,7 +48,10 @@ export class FavoritesService {
   addAlbum(id: string) {
     const album = this.dbService.albums.find((album) => album.id === id);
     if (!album) {
-      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'Album not found',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     }
     this.dbService.favorites.albums.push(id);
     return album;
@@ -65,7 +71,10 @@ export class FavoritesService {
   addArtist(id: string) {
     const artist = this.dbService.artists.find((artist) => artist.id === id);
     if (!artist) {
-      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'Artist not found',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     }
     this.dbService.favorites.artists.push(id);
     return artist;
