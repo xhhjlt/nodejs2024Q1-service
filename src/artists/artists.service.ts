@@ -52,6 +52,16 @@ export class ArtistsService {
       throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
     }
     this.favoritesService.removeArtist(id);
+    this.dbService.tracks.forEach((track) => {
+      if (track.artistId === id) {
+        track.artistId = null;
+      }
+    });
+    this.dbService.albums.forEach((album) => {
+      if (album.artistId === id) {
+        album.artistId = null;
+      }
+    });
     const [artist] = this.dbService.artists.splice(index, 1);
     return artist;
   }

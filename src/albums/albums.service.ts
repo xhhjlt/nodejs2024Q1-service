@@ -47,6 +47,11 @@ export class AlbumsService {
       throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
     }
     this.favoritesService.removeAlbum(id);
+    this.dbService.tracks.forEach((track) => {
+      if (track.albumId === id) {
+        track.albumId = null;
+      }
+    });
     const [album] = this.dbService.albums.splice(index, 1);
     return album;
   }
