@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { DbService } from 'src/db/db.service';
@@ -21,11 +21,17 @@ export class TracksService {
 
   findOne(id: string) {
     const track = this.dbService.tracks.find((track) => track.id === id);
+    if (!track) {
+      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
+    }
     return track;
   }
 
   update(id: string, updateTrackDto: UpdateTrackDto) {
     const index = this.dbService.tracks.findIndex((track) => track.id === id);
+    if (index === -1) {
+      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
+    }
     const [track] = this.dbService.tracks.splice(index, 1);
     const updatedTrack = { ...track, ...updateTrackDto };
     this.dbService.tracks.push(updatedTrack);
@@ -34,6 +40,9 @@ export class TracksService {
 
   remove(id: string) {
     const index = this.dbService.tracks.findIndex((track) => track.id === id);
+    if (index === -1) {
+      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
+    }
     const [track] = this.dbService.tracks.splice(index, 1);
     return track;
   }

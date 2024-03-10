@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { DbService } from 'src/db/db.service';
@@ -22,16 +22,39 @@ export class UsersService {
 
   findAll() {
     const users = this.dbService.users;
-    return users;
+    const formattedUsers = users.map((user) => ({
+      id: user.id,
+      login: user.login,
+      version: user.version,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    }));
+    return formattedUsers;
   }
 
   findOne(id: string) {
     const user = this.dbService.users.find((user) => user.id === id);
-    return user;
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    const formattedUser = {
+      id: user.id,
+      login: user.login,
+      version: user.version,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+    return formattedUser;
   }
 
   updatePassword(id: string, updatePasswordDto: UpdatePasswordDto) {
     const user = this.dbService.users.find((user) => user.id === id);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    if (user.password !== updatePasswordDto.oldPassword) {
+      throw new HttpException('Wrong old password', HttpStatus.FORBIDDEN);
+    }
     user.password = updatePasswordDto.newPassword;
     user.updatedAt = Date.now();
     return user;
@@ -39,6 +62,9 @@ export class UsersService {
 
   remove(id: string) {
     const index = this.dbService.users.findIndex((user) => user.id === id);
+    if (index === -1) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
     const [user] = this.dbService.users.splice(index, 1);
     return user;
   }

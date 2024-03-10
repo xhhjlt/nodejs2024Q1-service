@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { DbService } from 'src/db/db.service';
@@ -20,11 +20,17 @@ export class AlbumsService {
 
   findOne(id: string) {
     const album = this.dbService.albums.find((album) => album.id === id);
+    if (!album) {
+      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
+    }
     return album;
   }
 
   update(id: string, updateAlbumDto: UpdateAlbumDto) {
     const index = this.dbService.albums.findIndex((album) => album.id === id);
+    if (index === -1) {
+      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
+    }
     const [album] = this.dbService.albums.splice(index, 1);
     const updatedAlbum = { ...album, ...updateAlbumDto };
     this.dbService.albums.push(updatedAlbum);
@@ -33,6 +39,9 @@ export class AlbumsService {
 
   remove(id: string) {
     const index = this.dbService.albums.findIndex((album) => album.id === id);
+    if (index === -1) {
+      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
+    }
     const [album] = this.dbService.albums.splice(index, 1);
     return album;
   }
