@@ -2,10 +2,14 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { DbService } from 'src/db/db.service';
+import { FavoritesService } from 'src/favorites/favorites.service';
 
 @Injectable()
 export class AlbumsService {
-  constructor(private readonly dbService: DbService) {}
+  constructor(
+    private readonly dbService: DbService,
+    private readonly favoritesService: FavoritesService,
+  ) {}
   create(createAlbumDto: CreateAlbumDto) {
     const id = this.dbService.generateID();
     const album = { ...createAlbumDto, id };
@@ -42,6 +46,7 @@ export class AlbumsService {
     if (index === -1) {
       throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
     }
+    this.favoritesService.removeAlbum(id);
     const [album] = this.dbService.albums.splice(index, 1);
     return album;
   }

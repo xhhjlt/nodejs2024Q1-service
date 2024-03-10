@@ -7,5 +7,6 @@ import { DbModule } from 'src/db/db.module';
   controllers: [FavoritesController],
   providers: [FavoritesService],
   imports: [DbModule],
+  exports: [FavoritesService],
 })
 export class FavoritesModule {}

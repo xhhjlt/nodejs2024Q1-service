@@ -2,12 +2,12 @@ import {
   Controller,
   Get,
   Post,
-  Body,
   Param,
   Delete,
-  Put,
   ParseUUIDPipe,
   HttpCode,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 
@@ -28,7 +28,11 @@ export class FavoritesController {
   @Delete('track/:id')
   @HttpCode(204)
   removeTrack(@Param('id', ParseUUIDPipe) id: string) {
-    return this.favoritesService.removeTrack(id);
+    const track = this.favoritesService.removeTrack(id);
+    if (!track) {
+      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
+    }
+    return track;
   }
 
   @Post('album/:id')
@@ -39,7 +43,11 @@ export class FavoritesController {
   @Delete('album/:id')
   @HttpCode(204)
   removeAlbum(@Param('id', ParseUUIDPipe) id: string) {
-    return this.favoritesService.removeAlbum(id);
+    const album = this.favoritesService.removeAlbum(id);
+    if (!album) {
+      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
+    }
+    return album;
   }
 
   @Post('artist/:id')
@@ -50,6 +58,10 @@ export class FavoritesController {
   @Delete('artist/:id')
   @HttpCode(204)
   removeArtist(@Param('id', ParseUUIDPipe) id: string) {
-    return this.favoritesService.removeArtist(id);
+    const artist = this.favoritesService.removeArtist(id);
+    if (!artist) {
+      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+    }
+    return artist;
   }
 }

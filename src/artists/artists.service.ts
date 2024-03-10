@@ -2,10 +2,14 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { DbService } from 'src/db/db.service';
+import { FavoritesService } from 'src/favorites/favorites.service';
 
 @Injectable()
 export class ArtistsService {
-  constructor(private readonly dbService: DbService) {}
+  constructor(
+    private readonly dbService: DbService,
+    private readonly favoritesService: FavoritesService,
+  ) {}
 
   create(createArtistDto: CreateArtistDto) {
     const id = this.dbService.generateID();
@@ -47,6 +51,7 @@ export class ArtistsService {
     if (index === -1) {
       throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
     }
+    this.favoritesService.removeArtist(id);
     const [artist] = this.dbService.artists.splice(index, 1);
     return artist;
   }

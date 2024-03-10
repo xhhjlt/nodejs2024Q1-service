@@ -36,7 +36,7 @@ export class FavoritesService {
       (track) => track === id,
     );
     if (index === -1) {
-      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
+      return null;
     }
     const [track] = this.dbService.favorites.tracks.splice(index, 1);
     return track;
@@ -56,7 +56,7 @@ export class FavoritesService {
       (album) => album === id,
     );
     if (index === -1) {
-      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
+      return null;
     }
     const [album] = this.dbService.favorites.albums.splice(index, 1);
     return album;
@@ -76,7 +76,7 @@ export class FavoritesService {
       (artist) => artist === id,
     );
     if (index === -1) {
-      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+      return null;
     }
     const [artist] = this.dbService.favorites.artists.splice(index, 1);
     return artist;

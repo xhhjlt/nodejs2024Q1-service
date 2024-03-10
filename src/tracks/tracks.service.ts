@@ -2,10 +2,14 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { DbService } from 'src/db/db.service';
+import { FavoritesService } from 'src/favorites/favorites.service';
 
 @Injectable()
 export class TracksService {
-  constructor(private readonly dbService: DbService) {}
+  constructor(
+    private readonly dbService: DbService,
+    private readonly favoritesService: FavoritesService,
+  ) {}
 
   create(createTrackDto: CreateTrackDto) {
     const id = this.dbService.generateID();
@@ -43,6 +47,7 @@ export class TracksService {
     if (index === -1) {
       throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
     }
+    this.favoritesService.removeTrack(id);
     const [track] = this.dbService.tracks.splice(index, 1);
     return track;
   }
