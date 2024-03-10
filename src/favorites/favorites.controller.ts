@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
   ParseUUIDPipe,
+  HttpCode,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 
@@ -25,6 +26,7 @@ export class FavoritesController {
   }
 
   @Delete('track/:id')
+  @HttpCode(204)
   removeTrack(@Param('id', ParseUUIDPipe) id: string) {
     return this.favoritesService.removeTrack(id);
   }
@@ -35,6 +37,7 @@ export class FavoritesController {
   }
 
   @Delete('album/:id')
+  @HttpCode(204)
   removeAlbum(@Param('id', ParseUUIDPipe) id: string) {
     return this.favoritesService.removeAlbum(id);
   }
@@ -45,6 +48,7 @@ export class FavoritesController {
   }
 
   @Delete('artist/:id')
+  @HttpCode(204)
   removeArtist(@Param('id', ParseUUIDPipe) id: string) {
     return this.favoritesService.removeArtist(id);
   }
