@@ -17,7 +17,9 @@ export class UsersService {
       ...createUserDto,
     };
     this.dbService.users.push(user);
-    return user;
+    const resp = { ...user };
+    delete resp.password;
+    return resp;
   }
 
   findAll() {
@@ -57,7 +59,10 @@ export class UsersService {
     }
     user.password = updatePasswordDto.newPassword;
     user.updatedAt = Date.now();
-    return user;
+    user.version += 1;
+    const resp = { ...user };
+    delete resp.password;
+    return resp;
   }
 
   remove(id: string) {
