@@ -10,7 +10,12 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { TrackDto } from 'src/tracks/dto/track.dto';
+import { AlbumDto } from 'src/albums/dto/album.dto';
+import { ArtistDto } from 'src/artists/dto/artist.dto';
 
+@ApiTags('Favorites')
 @Controller('favs')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
@@ -20,6 +25,7 @@ export class FavoritesController {
     return this.favoritesService.findAll();
   }
 
+  @ApiResponse({ type: TrackDto })
   @Post('track/:id')
   addTrack(@Param('id', ParseUUIDPipe) id: string) {
     return this.favoritesService.addTrack(id);
@@ -32,9 +38,9 @@ export class FavoritesController {
     if (!track) {
       throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
     }
-    return track;
   }
 
+  @ApiResponse({ type: AlbumDto })
   @Post('album/:id')
   addAlbum(@Param('id', ParseUUIDPipe) id: string) {
     return this.favoritesService.addAlbum(id);
@@ -47,9 +53,9 @@ export class FavoritesController {
     if (!album) {
       throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
     }
-    return album;
   }
 
+  @ApiResponse({ type: ArtistDto })
   @Post('artist/:id')
   addArtist(@Param('id', ParseUUIDPipe) id: string) {
     return this.favoritesService.addArtist(id);
@@ -62,6 +68,5 @@ export class FavoritesController {
     if (!artist) {
       throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
     }
-    return artist;
   }
 }

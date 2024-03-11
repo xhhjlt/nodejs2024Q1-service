@@ -1,12 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsString, IsUUID } from 'class-validator';
 
-export class CreateArtistDto {
+export class ArtistDto {
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    description: 'Artist id',
+    format: 'uuid',
+  })
+  @IsUUID()
+  id: string;
+
   @ApiProperty({
     description: 'Name of the artist',
     example: 'System of a Down',
   })
-  @IsNotEmpty()
   @IsString()
   name: string;
 
@@ -14,7 +21,6 @@ export class CreateArtistDto {
     description: 'Grammy award for the artist',
     example: true,
   })
-  @IsNotEmpty()
   @IsBoolean()
   grammy: boolean;
 }

@@ -71,6 +71,8 @@ export class UsersService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
     const [user] = this.dbService.users.splice(index, 1);
-    return user;
+    const resp = { ...user };
+    delete resp.password;
+    return resp;
   }
 }
