@@ -17,6 +17,10 @@ git clone {repository URL}
 npm install
 ```
 
+## Enviroment
+
+Create in root .env file with PORT variable
+
 ## Running application
 
 ```
