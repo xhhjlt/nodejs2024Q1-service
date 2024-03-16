@@ -1,0 +1,31 @@
+version: "3"
+
+networks:
+  hlc_network: {
+    driver: "bridge"
+  } 
+services:
+  app:
+    build: .
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+    networks:
+      - hlc_network
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    restart: always
+    ports:
+      - ${DB_PORT}:5432
+    networks:
+      - hlc_network
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+volumes:
+  db_data:
