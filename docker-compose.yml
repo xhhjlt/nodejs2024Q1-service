@@ -12,9 +12,13 @@ services:
       - ${PORT}:${PORT}
     networks:
       - hlc_network
+    links:
+      - postgres
     depends_on:
-      - db
-  db:
+      - postgres
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:${DB_PORT}/${DB_NAME}
+  postgres:
     image: postgres:15
     restart: always
     ports:
