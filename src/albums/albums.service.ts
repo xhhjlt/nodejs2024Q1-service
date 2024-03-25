@@ -1,58 +1,48 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { DbService } from 'src/db/db.service';
 import { FavoritesService } from 'src/favorites/favorites.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AlbumsService {
   constructor(
-    private readonly dbService: DbService,
+    private readonly prismaService: PrismaService,
     private readonly favoritesService: FavoritesService,
   ) {}
-  create(createAlbumDto: CreateAlbumDto) {
-    const id = this.dbService.generateID();
-    const album = { ...createAlbumDto, id };
-    this.dbService.albums.push(album);
+  async create(createAlbumDto: CreateAlbumDto) {
+    const album = await this.prismaService.album.create({
+      data: createAlbumDto,
+    });
     return album;
   }
 
-  findAll() {
-    const albums = this.dbService.albums;
+  async findAll() {
+    const albums = await this.prismaService.album.findMany();
     return albums;
   }
 
-  findOne(id: string) {
-    const album = this.dbService.albums.find((album) => album.id === id);
+  async findOne(id: string) {
+    const album = await this.prismaService.album.findUnique({ where: { id } });
     if (!album) {
       throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
     }
     return album;
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    const index = this.dbService.albums.findIndex((album) => album.id === id);
-    if (index === -1) {
+  async update(id: string, updateAlbumDto: UpdateAlbumDto) {
+    const album = await this.prismaService.album.update({
+      where: { id },
+      data: updateAlbumDto,
+    });
+    if (!album) {
       throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
     }
-    const [album] = this.dbService.albums.splice(index, 1);
-    const updatedAlbum = { ...album, ...updateAlbumDto };
-    this.dbService.albums.push(updatedAlbum);
-    return updatedAlbum;
+    return album;
   }
 
-  remove(id: string) {
-    const index = this.dbService.albums.findIndex((album) => album.id === id);
-    if (index === -1) {
-      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
-    }
-    this.favoritesService.removeAlbum(id);
-    this.dbService.tracks.forEach((track) => {
-      if (track.albumId === id) {
-        track.albumId = null;
-      }
-    });
-    const [album] = this.dbService.albums.splice(index, 1);
+  async remove(id: string) {
+    const album = await this.prismaService.album.delete({ where: { id } });
     return album;
   }
 }
