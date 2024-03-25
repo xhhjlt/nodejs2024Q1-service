@@ -28,7 +28,7 @@ export class FavoritesService {
   }
 
   async addTrack(id: string) {
-    const track = this.prismaService.favoriteTrack.create({
+    const track = await this.prismaService.favoriteTrack.create({
       data: {
         trackId: id,
       },
@@ -41,7 +41,7 @@ export class FavoritesService {
   }
 
   async addAlbum(id: string) {
-    const album = this.prismaService.favoriteAlbum.create({
+    const album = await this.prismaService.favoriteAlbum.create({
       data: {
         albumId: id,
       },
@@ -54,7 +54,7 @@ export class FavoritesService {
   }
 
   async addArtist(id: string) {
-    const artist = this.prismaService.favoriteArtist.create({
+    const artist = await this.prismaService.favoriteArtist.create({
       data: {
         artistId: id,
       },

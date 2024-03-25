@@ -11,12 +11,6 @@
 git clone {repository URL}
 ```
 
-## Installing NPM modules
-
-```
-npm install
-```
-
 ## Enviroment
 
 Create in root .env file with PORT variable
@@ -24,8 +18,23 @@ Create in root .env file with PORT variable
 ## Running application
 
 ```
-npm start
+npm run docker:build
 ```
+or
+```
+docker compose up --build
+```
+
+After first start you must reset database:
+
+```
+npm run db:reset
+```
+or
+```
+prisma migrate reset --force
+```
+
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
@@ -68,9 +77,3 @@ npm run lint
 ```
 npm run format
 ```
-
-### Debugging in VSCode
-
-Press <kbd>F5</kbd> to debug.
-
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging
