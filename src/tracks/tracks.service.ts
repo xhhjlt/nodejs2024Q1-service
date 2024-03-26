@@ -1,54 +1,49 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { DbService } from 'src/db/db.service';
 import { FavoritesService } from 'src/favorites/favorites.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TracksService {
   constructor(
-    private readonly dbService: DbService,
+    private readonly prismaService: PrismaService,
     private readonly favoritesService: FavoritesService,
   ) {}
 
-  create(createTrackDto: CreateTrackDto) {
-    const id = this.dbService.generateID();
-    const track = { ...createTrackDto, id };
-    this.dbService.tracks.push(track);
+  async create(createTrackDto: CreateTrackDto) {
+    const track = await this.prismaService.track.create({
+      data: createTrackDto,
+    });
     return track;
   }
 
-  findAll() {
-    const tracks = this.dbService.tracks;
+  async findAll() {
+    const tracks = await this.prismaService.track.findMany();
     return tracks;
   }
 
-  findOne(id: string) {
-    const track = this.dbService.tracks.find((track) => track.id === id);
+  async findOne(id: string) {
+    const track = await this.prismaService.track.findUnique({ where: { id } });
     if (!track) {
       throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
     }
     return track;
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto) {
-    const index = this.dbService.tracks.findIndex((track) => track.id === id);
-    if (index === -1) {
+  async update(id: string, updateTrackDto: UpdateTrackDto) {
+    const track = await this.prismaService.track.update({
+      where: { id },
+      data: updateTrackDto,
+    });
+    if (!track) {
       throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
     }
-    const [track] = this.dbService.tracks.splice(index, 1);
-    const updatedTrack = { ...track, ...updateTrackDto };
-    this.dbService.tracks.push(updatedTrack);
-    return updatedTrack;
+    return track;
   }
 
-  remove(id: string) {
-    const index = this.dbService.tracks.findIndex((track) => track.id === id);
-    if (index === -1) {
-      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
-    }
-    this.favoritesService.removeTrack(id);
-    const [track] = this.dbService.tracks.splice(index, 1);
+  async remove(id: string) {
+    const track = await this.prismaService.track.delete({ where: { id } });
     return track;
   }
 }

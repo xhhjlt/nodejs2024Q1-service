@@ -1,93 +1,68 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { DbService } from 'src/db/db.service';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class FavoritesService {
-  constructor(private readonly dbService: DbService) {}
-  findAll() {
-    const favorites = this.dbService.favorites;
-    const albums = favorites.albums.map((id) =>
-      this.dbService.albums.find((album) => album.id === id),
-    );
-    const tracks = favorites.tracks.map((id) =>
-      this.dbService.tracks.find((track) => track.id === id),
-    );
-    const artists = favorites.artists.map((id) =>
-      this.dbService.artists.find((artist) => artist.id === id),
-    );
+  constructor(private readonly prismaService: PrismaService) {}
+  async findAll() {
+    const albums = await this.prismaService.favoriteAlbum.findMany({
+      include: {
+        album: true,
+      },
+    });
+    const tracks = await this.prismaService.favoriteTrack.findMany({
+      include: {
+        track: true,
+      },
+    });
+    const artists = await this.prismaService.favoriteArtist.findMany({
+      include: {
+        artist: true,
+      },
+    });
     return {
-      albums,
-      tracks,
-      artists,
+      albums: albums.map((album) => album.album),
+      tracks: tracks.map((track) => track.track),
+      artists: artists.map((artist) => artist.artist),
     };
   }
 
-  addTrack(id: string) {
-    const track = this.dbService.tracks.find((track) => track.id === id);
-    if (!track) {
-      throw new HttpException(
-        'Track not found',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-    this.dbService.favorites.tracks.push(id);
+  async addTrack(id: string) {
+    const track = await this.prismaService.favoriteTrack.create({
+      data: {
+        trackId: id,
+      },
+    });
     return track;
   }
 
-  removeTrack(id: string) {
-    const index = this.dbService.favorites.tracks.findIndex(
-      (track) => track === id,
-    );
-    if (index === -1) {
-      return null;
-    }
-    const [track] = this.dbService.favorites.tracks.splice(index, 1);
-    return track;
+  async removeTrack(id: string) {
+    await this.prismaService.favoriteTrack.delete({ where: { trackId: id } });
   }
 
-  addAlbum(id: string) {
-    const album = this.dbService.albums.find((album) => album.id === id);
-    if (!album) {
-      throw new HttpException(
-        'Album not found',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-    this.dbService.favorites.albums.push(id);
+  async addAlbum(id: string) {
+    const album = await this.prismaService.favoriteAlbum.create({
+      data: {
+        albumId: id,
+      },
+    });
     return album;
   }
 
-  removeAlbum(id: string) {
-    const index = this.dbService.favorites.albums.findIndex(
-      (album) => album === id,
-    );
-    if (index === -1) {
-      return null;
-    }
-    const [album] = this.dbService.favorites.albums.splice(index, 1);
-    return album;
+  async removeAlbum(id: string) {
+    await this.prismaService.favoriteAlbum.delete({ where: { albumId: id } });
   }
 
-  addArtist(id: string) {
-    const artist = this.dbService.artists.find((artist) => artist.id === id);
-    if (!artist) {
-      throw new HttpException(
-        'Artist not found',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-    this.dbService.favorites.artists.push(id);
+  async addArtist(id: string) {
+    const artist = await this.prismaService.favoriteArtist.create({
+      data: {
+        artistId: id,
+      },
+    });
     return artist;
   }
 
-  removeArtist(id: string) {
-    const index = this.dbService.favorites.artists.findIndex(
-      (artist) => artist === id,
-    );
-    if (index === -1) {
-      return null;
-    }
-    const [artist] = this.dbService.favorites.artists.splice(index, 1);
-    return artist;
+  async removeArtist(id: string) {
+    await this.prismaService.favoriteArtist.delete({ where: { artistId: id } });
   }
 }
